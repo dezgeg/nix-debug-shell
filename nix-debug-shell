@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -e
+dir=$(readlink -f $(dirname "$0"))
+
+declare -a args
+
+for arg in "$@"; do
+    if [ -n "$nextArgIsPkg" ]; then
+        pkg="$arg"
+        nextArgIsPkg=
+        continue
+    fi
+    case "$arg" in
+        -A)
+            if [ -n "$pkg" ]; then
+                echo "$0: error: -A argument given twice."
+                exit 1
+            fi
+            nextArgIsPkg=1
+            ;;
+        --no-ccache)
+            noCCache=1
+            ;;
+        *)
+            args+=("$arg")
+    esac
+done
+
+if [ -z "$pkg" ]; then
+    echo "$0: -A argument must be given."
+    exit 1
+fi
+
+buildDir="/tmp/nds-build-$pkg"
+if [ -d "$buildDir" ]; then
+    # TODO: maybe handle this instead of always wiping
+    # echo "Reusing existing build directory '$buildDir'. Run 'nd-reset' to wipe it and start the build from scratch."
+    echo "Wiping already existing build directory '$buildDir'."
+    rm -rf "$buildDir"
+else
+    echo "Creating new build directory '$buildDir'."
+fi
+mkdir -p "$buildDir"
+cd "$buildDir"
+
+#echo "noCCache: $noCCache, pkg: $pkg, args: ${args[@]}"
+nix-shell -A "$pkg" --command "source $dir/env.sh; return" "${args[@]}"
