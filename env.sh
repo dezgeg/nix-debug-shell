@@ -89,7 +89,7 @@ nd-goto() {
 
 nd-installclean() {
     safeRemove "$outputDirs" || return
-    echo "Wiped output path '$out'."
+    echo "Wiped output paths: $outputDirs."
 }
 
 nd-reset() {
@@ -141,6 +141,8 @@ nd-until() {
 ##### Interactive script starts here
 buildDir=$(pwd)
 outDirBase=${buildDir/nds-build/nds-install}
+
+oldOut="$out"
 for output in $outputs; do
     if [ "$output" = out ]; then
         declare -g "$output=$outDirBase"
@@ -149,6 +151,11 @@ for output in $outputs; do
     fi
     outputDirs="$outputDirs ${!output}"
 done
+
+if [ "$prefix" = "$oldOut" ]; then
+    prefix="$out"
+fi
+
 set +e
 
 # Copy-pasta from pkgs/stdenv/generic/setup.sh
