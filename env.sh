@@ -112,6 +112,7 @@ nd-run() {
 nd-step() {
     if [ "$curPhase" = "__END__" ]; then
         echo "All build phases are already executed."
+        return
     fi
     runPhase "$curPhase"
     if [ $? = 0 ]; then
