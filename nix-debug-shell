@@ -41,7 +41,6 @@ else
     echo "Creating new build directory '$buildDir'."
 fi
 mkdir -p "$buildDir"
-cd "$buildDir"
 
 #echo "noCCache: $noCCache, pkg: $pkg, args: ${args[@]}"
-nix-shell -A "$pkg" --command "source $dir/env.sh; return" "${args[@]}"
+nix-shell -A "$pkg" --command "cd $buildDir; source $dir/env.sh; return" "${args[@]}"
