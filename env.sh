@@ -26,13 +26,15 @@ runPhase() {
         # environment to the parent shell. Use 'declare -g' since otherwise
         # the variables are only local to this function.
         typeset -p | sed -e 's/^declare/declare -g/' > /tmp/vars.$$
+        pwd > /tmp/cwd.$$
     )
     if [ $? = 1 ]; then
         echo "Phase '$1' failed."
         return 1
     else
         source /tmp/vars.$$ 2>/dev/null
-        rm -rf /tmp/vars.$$
+        cd "$(cat /tmp/cwd.$$)"
+        rm -rf /tmp/vars.$$ /tmp/cwd.$$
     fi
 }
 
