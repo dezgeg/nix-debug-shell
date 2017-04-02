@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-dir=$(readlink -f $(dirname "$0"))
+dir=$(dirname $(readlink -f "$0"))
 
 declare -a args
 
