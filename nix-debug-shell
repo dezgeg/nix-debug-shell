@@ -5,11 +5,20 @@ dir=$(dirname $(readlink -f "$0"))
 declare -a args
 
 for arg in "$@"; do
+    case "$arg" in
+        --no-ccache)
+            noCCache=1
+            ;;
+        *)
+            args+=("$arg")
+    esac
+
     if [ -n "$nextArgIsPkg" ]; then
         pkg="$arg"
         nextArgIsPkg=
         continue
     fi
+
     case "$arg" in
         -A)
             if [ -n "$pkg" ]; then
@@ -18,11 +27,6 @@ for arg in "$@"; do
             fi
             nextArgIsPkg=1
             ;;
-        --no-ccache)
-            noCCache=1
-            ;;
-        *)
-            args+=("$arg")
     esac
 done
 
@@ -43,4 +47,4 @@ fi
 mkdir -p "$buildDir"
 
 #echo "noCCache: $noCCache, pkg: $pkg, args: ${args[@]}"
-nix-shell -A "$pkg" --command "cd $buildDir; source $dir/env.sh; return" "${args[@]}"
+nix-shell --command "cd $buildDir; source $dir/env.sh; return" "${args[@]}"
